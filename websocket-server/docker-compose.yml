@@ -1,0 +1,38 @@
+services:
+  mongodb:
+    image: mongo
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: bagga
+      MONGO_INITDB_ROOT_PASSWORD: 3asfour25102212
+      MONGO_INITDB_DATABASE: chat_app
+    networks:
+      - websocket-network
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_ADMINUSERNAME: bagga
+      ME_CONFIG_MONGODB_ADMINPASSWORD: 3asfour25102212
+      ME_CONFIG_BASICAUTH_USERNAME: bagga
+      ME_CONFIG_BASICAUTH_PASSWORD: 3asfour25102212
+    depends_on:
+      - mongodb
+    networks:
+      - websocket-network
+
+volumes:
+  mongo:
+
+networks:
+  websocket-network:
+    driver: bridge

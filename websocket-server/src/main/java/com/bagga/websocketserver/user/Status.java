@@ -1,0 +1,7 @@
+package com.bagga.websocketserver.user;
+
+
+public enum Status {
+    ONLINE,
+    OFFLINE
+}

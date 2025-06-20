@@ -1,0 +1,12 @@
+spring:
+  data:
+    mongodb:
+      username: bagga
+      password: 3asfour25102212
+      host: localhost
+      port: 27017
+      database: chat_app
+      authentication-database: admin
+
+server:
+  port: 8080

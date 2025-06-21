@@ -23,6 +23,7 @@ public class ChatController {
     @Autowired
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatRoomRepository  chatRoomRepository;
+    private final ChatRoomService chatRoomService;
     @MessageMapping("/chat/privateMessage")
     public void processMessage(@Payload ChatMessage chatMessage) {
         System.out.println("Received chat message: " + chatMessage);
@@ -50,6 +51,11 @@ public class ChatController {
     @GetMapping("/AllChatRooms")
     public ResponseEntity<List<ChatRoom>> findAllChatRooms() {
         return ResponseEntity.ok(this.chatRoomRepository.findAll());
+    }
+
+    @GetMapping("/findChatRoomByChatId/{senderId}/{recipientId}")
+    public ResponseEntity<List<ChatRoom>> findChatRoomByChatId(@PathVariable("senderId") String senderId, @PathVariable("recipientId") String recipientId) {
+        return ResponseEntity.ok(this.chatRoomService.findChatRoomByChatId(senderId,recipientId));
     }
 
 }

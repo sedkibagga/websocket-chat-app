@@ -7,14 +7,17 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "flowbite-react patch"
   },
   "dependencies": {
     "@stomp/stompjs": "^7.1.1",
     "@tailwindcss/vite": "^4.1.10",
     "axios": "^1.10.0",
+    "flowbite-react": "^0.11.8",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.2",
     "react-uuid": "^2.0.0",
     "sockjs-client": "^1.6.1",
     "tailwindcss": "^4.1.10",

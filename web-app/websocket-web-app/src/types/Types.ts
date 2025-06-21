@@ -1,9 +1,11 @@
+
+
 export interface User {
   id?: string;
   fullName: string;
   nickName: string;
   status?: 'ONLINE' | 'OFFLINE';
-  email?: string;
+  email: string;
 }
 
 export interface ChatMessage {

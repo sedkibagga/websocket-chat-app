@@ -6,7 +6,6 @@ const ChatUI: React.FC = () => {
     currentUser,
     users,
     chatMessages,
-    privateMessages,
     sendChatMessage,
     // sendPrivateMessage,
     disconnect

@@ -3,6 +3,7 @@ package com.bagga.websocketserver.chatroom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,5 +39,10 @@ public class ChatRoomService {
         this.chatRoomRepository.save(senderRecipient);
         this.chatRoomRepository.save(recipientSender);
         return chatId;
+    }
+
+    public List<ChatRoom> findChatRoomByChatId(String senderId, String recipientId) {
+        String chatId = String.format("%s_%s",senderId,recipientId);
+        return this.chatRoomRepository.findByChatId(chatId);
     }
 }

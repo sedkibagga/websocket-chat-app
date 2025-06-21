@@ -1,43 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { useChat } from '../context/ChatContext';
-import { Button } from "flowbite-react";
-import { useNavigate } from 'react-router-dom';
-import type { loginUserDto } from '../apis/DataParam/dtos';
+import React, { useEffect, useState } from 'react';
 import apisController from '../apis/services/apisController';
-import type { loginUserResponse } from '../apis/DataResponse/responses';
+import type { addUserResponse } from '../apis/DataResponse/responses';
+import type { addUserDto } from '../apis/DataParam/dtos';
+import { useNavigate } from 'react-router-dom';
 
-type LoginProps = {
-    onConnect: () => void;
-};
-
-const Login: React.FC<LoginProps> = ({ onConnect }) => {
+function SignUpComponent() {
     const [formData, setFormData] = useState({
+        nickName: '',
+        fullName: '',
         email: '',
         password: ''
     });
-
+    
     const [errors, setErrors] = useState({
+        nickName: '',
+        fullName: '',
         email: '',
         password: ''
     });
-
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    
     const navigate = useNavigate();
-    const { connect, currentUser, setCurrentUser } = useChat();
     const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
     const [darkMode, setDarkMode] = useState(false);
     const [redMode, setRedMode] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const validateForm = () => {
-        const newErrors = {
-            email: formData.email.trim() ?
-                (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ? '' : 'Invalid email format')
-                : 'Email is required',
-            password: formData.password.length >= 6 ? '' : 'Password must be at least 6 characters'
-        };
-
-        setErrors(newErrors);
-        return !Object.values(newErrors).some(error => error);
+    const getGradientColors = () => {
+        if (darkMode && redMode) return ['#450a0a', '#7f1d1d', '#991b1b'];
+        if (darkMode) return ['#0f172a', '#1e293b', '#334155'];
+        if (redMode) return ['#fee2e2', '#fecaca', '#fca5a5'];
+        return ['#3b82f6', '#8b5cf6', '#ec4899'];
     };
 
     useEffect(() => {
@@ -48,16 +40,21 @@ const Login: React.FC<LoginProps> = ({ onConnect }) => {
         };
 
         window.addEventListener('mousemove', handleMouseMove);
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-        };
+        return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
-    const getGradientColors = () => {
-        if (darkMode && redMode) return ['#450a0a', '#7f1d1d', '#991b1b'];
-        if (darkMode) return ['#0f172a', '#1e293b', '#334155'];
-        if (redMode) return ['#fee2e2', '#fecaca', '#fca5a5'];
-        return ['#3b82f6', '#8b5cf6', '#ec4899'];
+    const validateForm = () => {
+        const newErrors = {
+            nickName: formData.nickName.trim() ? '' : 'Nickname is required',
+            fullName: formData.fullName.trim() ? '' : 'Full name is required',
+            email: formData.email.trim() ? 
+                  (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ? '' : 'Invalid email format') 
+                  : 'Email is required',
+            password: formData.password.length >= 6 ? '' : 'Password must be at least 6 characters'
+        };
+        
+        setErrors(newErrors);
+        return !Object.values(newErrors).some(error => error);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -67,29 +64,32 @@ const Login: React.FC<LoginProps> = ({ onConnect }) => {
         
         try {
             setIsSubmitting(true);
-            const userDto: loginUserResponse = await apisController.login({
+            const user: addUserDto = {
+                nickName: formData.nickName,
+                fullName: formData.fullName,
                 email: formData.email,
                 password: formData.password
-            });
+            };
             
-            setCurrentUser(userDto);
-            connect({
-                id: userDto.id || '',
-                email: formData.email,
-                fullName: userDto.fullName,
-                nickName: userDto.nickName,
-                status: 'ONLINE'
-            });
+            const response: addUserResponse = await apisController.addUser(user);
             
-            onConnect();
-            navigate('/chat');
+            alert(`Account created successfully! Welcome, ${response.nickName}`);
+            navigate('/login');
+            
+            // Reset form
+            setFormData({
+                nickName: '',
+                fullName: '',
+                email: '',
+                password: ''
+            });
             
         } catch (error: any) {
-            console.error("Error during login:", error);
-            setErrors({
-                email: 'Invalid credentials',
-                password: 'Invalid credentials'
-            });
+            console.error('Signup error:', error);
+            setErrors(prev => ({
+                ...prev,
+                email: error.message || 'Registration failed. Please try again.'
+            }));
         } finally {
             setIsSubmitting(false);
         }
@@ -98,7 +98,7 @@ const Login: React.FC<LoginProps> = ({ onConnect }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
         setFormData(prev => ({ ...prev, [id]: value }));
-
+        
         // Clear error when user types
         if (errors[id as keyof typeof errors]) {
             setErrors(prev => ({ ...prev, [id]: '' }));
@@ -118,7 +118,6 @@ const Login: React.FC<LoginProps> = ({ onConnect }) => {
 
     return (
         <div className="flex items-center justify-center p-4 flex-col" style={gradientStyle}>
-            {/* Theme toggle buttons */}
             <div className="flex gap-4 mb-6">
                 <button
                     onClick={() => setDarkMode(!darkMode)}
@@ -138,13 +137,52 @@ const Login: React.FC<LoginProps> = ({ onConnect }) => {
                 </button>
             </div>
 
-            <div className="rounded-lg shadow-xl p-8 w-full max-w-md" style={formContainerStyle}>
+            <div className="rounded-lg shadow-xl p-8 w-full max-w-lg" style={formContainerStyle}>
                 <h2 className="text-2xl font-bold mb-6">
                     {redMode ? '🔥 ' : ''}
-                    Login to Chat
+                    Sign Up for Chat
                     {darkMode ? ' 🌙' : ''}
                 </h2>
+
                 <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label className="block mb-2" htmlFor="nickName">
+                            Nick Name
+                        </label>
+                        <input
+                            id="nickName"
+                            type="text"
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+                            style={{
+                                borderColor: errors.nickName ? '#ef4444' : darkMode ? '#334155' : '#d1d5db',
+                                backgroundColor: darkMode ? '#1e293b' : 'white',
+                                color: darkMode ? 'white' : 'inherit'
+                            }}
+                            value={formData.nickName}
+                            onChange={handleChange}
+                        />
+                        {errors.nickName && <p className="text-red-500 text-sm mt-1">{errors.nickName}</p>}
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="block mb-2" htmlFor="fullName">
+                            Full Name
+                        </label>
+                        <input
+                            id="fullName"
+                            type="text"
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+                            style={{
+                                borderColor: errors.fullName ? '#ef4444' : darkMode ? '#334155' : '#d1d5db',
+                                backgroundColor: darkMode ? '#1e293b' : 'white',
+                                color: darkMode ? 'white' : 'inherit'
+                            }}
+                            value={formData.fullName}
+                            onChange={handleChange}
+                        />
+                        {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>}
+                    </div>
+
                     <div className="mb-4">
                         <label className="block mb-2" htmlFor="email">
                             Email
@@ -158,12 +196,12 @@ const Login: React.FC<LoginProps> = ({ onConnect }) => {
                                 backgroundColor: darkMode ? '#1e293b' : 'white',
                                 color: darkMode ? 'white' : 'inherit'
                             }}
-                            required
                             value={formData.email}
                             onChange={handleChange}
                         />
                         {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                     </div>
+
                     <div className="mb-6">
                         <label className="block mb-2" htmlFor="password">
                             Password
@@ -177,12 +215,12 @@ const Login: React.FC<LoginProps> = ({ onConnect }) => {
                                 backgroundColor: darkMode ? '#1e293b' : 'white',
                                 color: darkMode ? 'white' : 'inherit'
                             }}
-                            required
                             value={formData.password}
                             onChange={handleChange}
                         />
                         {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
                     </div>
+
                     <button
                         type="submit"
                         disabled={isSubmitting}
@@ -196,23 +234,12 @@ const Login: React.FC<LoginProps> = ({ onConnect }) => {
                                         : 'bg-blue-600 hover:bg-blue-700 text-white'
                         }`}
                     >
-                        {isSubmitting ? 'Logging in...' : 'Connect'}
+                        {isSubmitting ? 'Creating Account...' : 'Sign Up'}
                     </button>
                 </form>
             </div>
-            <div className="mt-6 flex flex-row items-center justify-center bg-gradient-to-r from-gray-800 to-gray-900 bg-opacity-90 rounded-lg shadow-md p-4 w-full max-w-md transition-all duration-300 hover:shadow-lg">
-                <p className="text-white text-lg font-medium mr-4">
-                    Don't have an account?
-                </p>
-                <Button
-                    className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:bg-gradient-to-bl focus:ring-4 focus:ring-cyan-300 dark:focus:ring-blue-800 h-10 px-6 py-2 rounded-lg transition duration-300"
-                    onClick={() => navigate('/signup')}
-                >
-                    Sign Up
-                </Button>
-            </div>
         </div>
     );
-};
+}
 
-export default Login;
+export default SignUpComponent;

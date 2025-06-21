@@ -1,5 +1,6 @@
 package com.bagga.websocketserver.user;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,10 +11,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @ToString
 @Document
+@Builder
 public class User {
     @Id
     private String id;
     private String nickName;
     private String fullName;
+    public String email;
+    public String password;
     private Status status;
 }

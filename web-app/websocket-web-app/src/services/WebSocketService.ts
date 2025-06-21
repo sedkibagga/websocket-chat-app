@@ -2,13 +2,14 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import type { User } from '../types/Types';
 import type { ChatMessage, ChatNotification } from '../types/Types';
+import type { loginUserResponse } from '../apis/DataResponse/responses';
 class WebSocketService {
   private stompClient: Client | null = null;
-  private currentUser: User | null = null;
+  private currentUser: loginUserResponse | null = null;
 
   connect(
-    user: User,
-    onUserListUpdated: (users: User[]) => void,
+    user: loginUserResponse,
+    onUserListUpdated: (users: loginUserResponse[]) => void,
     // onPrivateMessage: (message: string) => void,
     onChatMessage: (notification: ChatNotification) => void,
     onError: (error: string) => void
@@ -28,29 +29,26 @@ class WebSocketService {
     this.stompClient.onConnect = () => {
       console.log('Connected to WebSocket');
 
-      // Register user
+      
       this.stompClient?.publish({
         destination: '/app/addUser/user.addUser',
         body: JSON.stringify(user)
       });
 
-      // Subscribe to public user updates
-      this.stompClient?.subscribe('/topic/publicUsers/findConnectUsers', (message) => {
-        const updatedUsers = JSON.parse(message.body) as User[];
+      
+      this.stompClient?.subscribe('/topic/publicUsers/findUsers', (message) => {
+        const updatedUsers = JSON.parse(message.body) as loginUserResponse[];
         onUserListUpdated(updatedUsers);
       });
 
       this.stompClient?.subscribe('/topic/publicUsers/addUser', (message) => {
-        const newUser = JSON.parse(message.body) as User;
-        onUserListUpdated([newUser]); // Add the new user to the list
+        const newUser = JSON.parse(message.body) as loginUserResponse;
+        onUserListUpdated([newUser]); 
       });
 
-      // Subscribe to private messages with explicit username in path
-      // this.stompClient?.subscribe(`/user/${user.fullName}/queue/private`, (message) => {
-      //   onPrivateMessage(message.body);
-      // });
+      
+     
 
-      // Subscribe to chat messages with explicit username in path
       this.stompClient?.subscribe(`/user/${user.fullName}/queue/messages`, (message) => {
         console.log(`Subscribed to /user/${user.fullName}/queue/messages`);
         console.log("Received chat message in my private queue:", message.body);
@@ -128,7 +126,7 @@ class WebSocketService {
   findConnectedUsers() {
     if (this.stompClient) {
       this.stompClient.publish({
-        destination: '/app/findUsers/user.findConnectUsers',
+        destination: '/app/findUsers/user.findUsers',
 
       });
     }

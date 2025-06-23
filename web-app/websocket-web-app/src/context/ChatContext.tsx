@@ -42,7 +42,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     webSocketService.connect(
       user,
-      (updatedUsers) => setUsers(prev => [...prev, ...updatedUsers]),
+      (updatedUsers) => setUsers(updatedUsers),
     
       (notification) => {
         console.log('Received notification:', notification);
@@ -80,6 +80,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log("Fetching users for current user:", currentUser);
         const response = await apisController.findAllUsers();
         setUsers(response);
+        webSocketService.findConnectedUsers();
       }
       return;
 
@@ -103,7 +104,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(error instanceof Error ? error.message : 'Failed to fetch chat messages');
     }
   }
-
+  
+  
 
   useEffect(() => {
     return () => {

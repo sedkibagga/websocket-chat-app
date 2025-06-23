@@ -3,10 +3,10 @@ import SockJS from 'sockjs-client';
 import type { User } from '../types/Types';
 import type { ChatMessage, ChatNotification } from '../types/Types';
 import type { loginUserResponse } from '../apis/DataResponse/responses';
+import { useChat } from '../context/ChatContext';
 class WebSocketService {
   private stompClient: Client | null = null;
   private currentUser: loginUserResponse | null = null;
-
   connect(
     user: loginUserResponse,
     onUserListUpdated: (users: loginUserResponse[]) => void,
@@ -29,25 +29,33 @@ class WebSocketService {
     this.stompClient.onConnect = () => {
       console.log('Connected to WebSocket');
 
-      
-      this.stompClient?.publish({
-        destination: '/app/addUser/user.addUser',
-        body: JSON.stringify(user)
-      });
 
-      
+      // this.stompClient?.publish({
+      //   destination: '/app/addUser/user.addUser',
+      //   body: JSON.stringify(user)
+      // });
+
+
       this.stompClient?.subscribe('/topic/publicUsers/findUsers', (message) => {
+        console.log('Subscribed to /topic/publicUsers/findUsers');
+        console.log("Received user list update:", message.body);
         const updatedUsers = JSON.parse(message.body) as loginUserResponse[];
         onUserListUpdated(updatedUsers);
       });
 
-      this.stompClient?.subscribe('/topic/publicUsers/addUser', (message) => {
-        const newUser = JSON.parse(message.body) as loginUserResponse;
-        onUserListUpdated([newUser]); 
+      // this.stompClient?.subscribe('/topic/publicUsers/addUser', (message) => {
+      //   const newUser = JSON.parse(message.body) as loginUserResponse;
+      //   onUserListUpdated([newUser]); 
+      // });
+      // In your connect method
+      this.stompClient?.subscribe('/topic/publicUsers/disconnectUser', (message) => {
+        const listOfUsers = JSON.parse(message.body);
+        console.log('Subscribed to /topic/publicUsers/disconnectUser');
+        console.log("Received user disconnection update:", listOfUsers);
+        onUserListUpdated(listOfUsers);
       });
 
-      
-     
+
 
       this.stompClient?.subscribe(`/user/${user.fullName}/queue/messages`, (message) => {
         console.log(`Subscribed to /user/${user.fullName}/queue/messages`);
@@ -81,15 +89,38 @@ class WebSocketService {
     this.stompClient.activate();
   }
 
-  disconnect() {
-    if (this.stompClient && this.currentUser) {
+  disconnect(): Promise<void> {
+  return new Promise((resolve) => {
+    if (!this.stompClient || !this.currentUser) {
+      console.warn('WebSocket client or current user not initialized, skipping disconnect');
+      resolve();
+      return;
+    }
+
+    // Send disconnect notification first
+    try {
+      console.log('Sending disconnect message for user:', this.currentUser);
       this.stompClient.publish({
         destination: '/app/disconnect/user.disconnectUser',
         body: JSON.stringify(this.currentUser)
       });
-      this.stompClient.deactivate();
+      console.log('Disconnect message sent successfully');
+    } catch (e) {
+      console.error('Error sending disconnect message:', e);
     }
-  }
+
+    // Then disconnect
+    this.stompClient.deactivate().then(() => {
+      console.log('WebSocket fully disconnected');
+      this.stompClient = null;
+      this.currentUser = null;
+      resolve();
+    }).catch(err => {
+      console.error('Error during deactivation:', err);
+      resolve();
+    });
+  });
+}
 
   // sendPrivateMessage(recipient: string, content: string) {
   //   if (this.stompClient && this.currentUser) {
@@ -127,6 +158,7 @@ class WebSocketService {
     if (this.stompClient) {
       this.stompClient.publish({
         destination: '/app/findUsers/user.findUsers',
+
 
       });
     }

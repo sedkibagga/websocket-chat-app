@@ -3,8 +3,10 @@ import apisController from '../apis/services/apisController';
 import type { addUserResponse } from '../apis/DataResponse/responses';
 import type { addUserDto } from '../apis/DataParam/dtos';
 import { useNavigate } from 'react-router-dom';
+import { useChat } from '../context/ChatContext';
 
 function SignUpComponent() {
+    const {fetchUsers} = useChat();
     const [formData, setFormData] = useState({
         nickName: '',
         fullName: '',
@@ -74,6 +76,7 @@ function SignUpComponent() {
             const response: addUserResponse = await apisController.addUser(user);
             
             alert(`Account created successfully! Welcome, ${response.nickName}`);
+            fetchUsers(); // Refresh user list
             navigate('/login');
             
             // Reset form

@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useChat } from '../context/ChatContext';
 import type { User } from '../types/Types';
+import { useNavigate } from 'react-router-dom';
 const ChatUI: React.FC = () => {
+  const navigate = useNavigate(); 
+  const handleNavigateToChatMessage = () => {
+    navigate('/chatMessagePage');
+  }
   const {
     currentUser,
     users,
@@ -42,8 +47,9 @@ const ChatUI: React.FC = () => {
       <header>
         <h2>Chat as {currentUser.fullName}</h2>
         <button onClick={disconnect}>Disconnect</button>
+        
       </header>
-
+<button onClick={handleNavigateToChatMessage}>Go to Chat Message Page</button>
       <div className="chat-content">
         <div className="user-list">
           <h3>Online Users</h3>

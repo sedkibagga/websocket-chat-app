@@ -12,5 +12,5 @@ export type addUserDto = {
 
 export type logoutUserDto = {
     email: string;
-    password: string;
+    id: string;
 }

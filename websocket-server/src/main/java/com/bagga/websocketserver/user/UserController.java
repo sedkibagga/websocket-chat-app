@@ -32,37 +32,37 @@ public class UserController {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
 
-    @MessageMapping("/addUser/user.addUser") // Handles messages sent to /app/user.addUser (because of setApplicationDestinationPrefixes("/app"))
-    @SendTo("/topic/publicUsers/addUser") // Broadcasts the response to all clients subscribed to /user/topic
-
-    // Client sends user data: stompClient.send("/app/user.addUser", {}, JSON.stringify({username: "john", email: "john@example.com"}));
-    // Server receives it at /app/user.addUser and maps it here using @MessageMapping
-    // @Payload automatically converts the JSON into a User object
-    // Server processes: userService.saveUser(user); and returns the saved user
-    // Response is sent to /user/topic and broadcast to all subscribed clients
-    // Client subscribes: stompClient.subscribe('/user/topic', (message) => { const user = JSON.parse(message.body); console.log("New user added:", user.username); });
-
-    public AddUserResponse addUser(@Payload AddUserDto userDto) {
-       try {
-           if (this.userService.existsByEmail(userDto.getEmail())) {
-               throw new RuntimeException("User with email " + userDto.getEmail() + " already exists");
-           }
-           User user = User.builder()
-                   .nickName(userDto.getNickName())
-                   .fullName(userDto.getFullName())
-                   .email(userDto.getEmail())
-                   .password(userDto.getPassword())
-                   .status(Status.OFFLINE)
-                   .build();
-
-           return this.userService.saveUser(user);
-       }catch (Exception e) {
-           log.error(e.getMessage());
-           throw new RuntimeException(e.getMessage());
-
-       }
-
-    }
+//    @MessageMapping("/addUser/user.addUser") // Handles messages sent to /app/user.addUser (because of setApplicationDestinationPrefixes("/app"))
+//    @SendTo("/topic/publicUsers/addUser") // Broadcasts the response to all clients subscribed to /user/topic
+//
+//    // Client sends user data: stompClient.send("/app/user.addUser", {}, JSON.stringify({username: "john", email: "john@example.com"}));
+//    // Server receives it at /app/user.addUser and maps it here using @MessageMapping
+//    // @Payload automatically converts the JSON into a User object
+//    // Server processes: userService.saveUser(user); and returns the saved user
+//    // Response is sent to /user/topic and broadcast to all subscribed clients
+//    // Client subscribes: stompClient.subscribe('/user/topic', (message) => { const user = JSON.parse(message.body); console.log("New user added:", user.username); });
+//
+//    public AddUserResponse addUser(@Payload AddUserDto userDto) {
+//       try {
+//           if (this.userService.existsByEmail(userDto.getEmail())) {
+//               throw new RuntimeException("User with email " + userDto.getEmail() + " already exists");
+//           }
+//           User user = User.builder()
+//                   .nickName(userDto.getNickName())
+//                   .fullName(userDto.getFullName())
+//                   .email(userDto.getEmail())
+//                   .password(userDto.getPassword())
+//                   .status(Status.OFFLINE)
+//                   .build();
+//
+//           return this.userService.saveUser(user);
+//       }catch (Exception e) {
+//           log.error(e.getMessage());
+//           throw new RuntimeException(e.getMessage());
+//
+//       }
+//
+//    }
 
 
 
@@ -78,9 +78,9 @@ public class UserController {
 
     @MessageMapping("/disconnect/user.disconnectUser")
     @SendTo("/topic/publicUsers/disconnectUser")
-    public User disconnect(@Payload User user) {
+    public List<FindAllUsersResponse> disconnect(@Payload User user) {
         this.userService.disconnect(user);
-        return user;
+        return this.userService.findAllUsers();
     }
 
 

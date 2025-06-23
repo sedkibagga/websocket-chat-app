@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class LogoutUserDto {
+    public String id ;
     public String email;
-    public String password;
+
 }

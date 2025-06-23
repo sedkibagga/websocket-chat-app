@@ -5,7 +5,8 @@ import Login from './components/Login';
 import ChatPage from './pages/ChatPage';
 import SignUpPage from './pages/SignUpPage';
 import ChatMessagePage from './pages/ChatMessagePage';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './routesProtection/ProtectedRoute';
+import LoginSignUpProtection from './routesProtection/LoginSignUpProtection';
 
 function App() {
   return (
@@ -14,8 +15,16 @@ function App() {
         <div className="app">
           <Routes>
             {/* Public Routes (accessible when not logged in) */}
-            <Route path="/login" element={<Login/>} />
-            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/login" element={
+              <LoginSignUpProtection>
+              <Login/>
+              </LoginSignUpProtection>
+              } />
+            <Route path="/signup" element={
+              <LoginSignUpProtection>
+              <SignUpPage />
+              </LoginSignUpProtection>
+              } />
 
             {/* Protected Routes (only accessible when logged in) */}
             <Route
@@ -36,16 +45,11 @@ function App() {
             />
 
             {/* Redirect root path based on auth status */}
-            <Route
-              path="/"
-              element={
-                localStorage.getItem('userData') ? (
-                  <Navigate to="/chat" replace />
-                ) : (
-                  <Navigate to="/login" replace />
-                )
-              }
-            />
+            <Route path="/" element={
+              <LoginSignUpProtection>
+                <Navigate to="/login" replace />
+              </LoginSignUpProtection>
+            } />
           </Routes>
         </div>
       </Router>

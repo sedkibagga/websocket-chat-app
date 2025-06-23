@@ -6,11 +6,11 @@ import type { loginUserDto } from '../apis/DataParam/dtos';
 import apisController from '../apis/services/apisController';
 import type { loginUserResponse } from '../apis/DataResponse/responses';
 
-type LoginProps = {
-    onConnect: () => void;
-};
+// type LoginProps = {
+//     onConnect: () => void;
+// };
 
-const Login: React.FC<LoginProps> = ({ onConnect }) => {
+const Login: React.FC = () => {
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -81,7 +81,7 @@ const Login: React.FC<LoginProps> = ({ onConnect }) => {
                 status: 'ONLINE'
             });
             
-            onConnect();
+            
             navigate('/chat');
             
         } catch (error: any) {

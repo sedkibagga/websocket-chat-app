@@ -11,6 +11,8 @@ interface ChatContextType {
   senderId: string;
   setSenderId: (senderId: string) => void;
   recipientId: string;
+  isConnected: boolean;
+  setIsConnected: (isConnected: boolean) => void;
   setRecipientId: (recipientId: string) => void;
   chatMessages: ChatMessage[];
   privateMessages: string[];
@@ -32,6 +34,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
   const [senderId, setSenderId] = useState<string>("");
   const [recipientId, setRecipientId] = useState<string>("");
+  const [isConnected, setIsConnected] = useState(false);
+
   const connect = (user: loginUserResponse) => {
     setCurrentUser(user);
     console.log("Connecting user:", user);
@@ -143,7 +147,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sendChatMessage,
       fetchUsers,
       fetchChatMessages,
-      error
+      error,
+      isConnected,
+      setIsConnected
     }}>
       {children}
     </ChatContext.Provider>

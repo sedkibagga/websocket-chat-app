@@ -1,55 +1,50 @@
-import { useState } from 'react';
-import { BrowserRouter as Router,Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Navigate } from 'react-router-dom';
 import { Routes } from "react-router"
 import { ChatProvider } from './context/ChatContext';
 import Login from './components/Login';
 import ChatPage from './pages/ChatPage';
 import SignUpPage from './pages/SignUpPage';
+import ChatMessagePage from './pages/ChatMessagePage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  const [isConnected, setIsConnected] = useState(false);
-
   return (
     <ChatProvider>
       <Router>
         <div className="app">
           <Routes>
-            <Route 
-              path="/login" 
+            {/* Public Routes (accessible when not logged in) */}
+            <Route path="/login" element={<Login/>} />
+            <Route path="/signup" element={<SignUpPage />} />
+
+            {/* Protected Routes (only accessible when logged in) */}
+            <Route
+              path="/chat"
               element={
-                isConnected ? (
-                  <Navigate to="/chat" replace />
-                ) : (
-                  <Login onConnect={() => setIsConnected(true)} />
-                )
-              } 
-            />
-            
-            <Route 
-              path="/chat" 
-              element={
-                isConnected ? (
+                <ProtectedRoute>
                   <ChatPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chatMessagePage"
+              element={
+                <ProtectedRoute>
+                  <ChatMessagePage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Redirect root path based on auth status */}
+            <Route
+              path="/"
+              element={
+                localStorage.getItem('userData') ? (
+                  <Navigate to="/chat" replace />
                 ) : (
                   <Navigate to="/login" replace />
                 )
-              } 
-            />
-            <Route
-            path='/signup'
-            element={
-               isConnected ? (
-                <Navigate to="/chat" replace />
-              ) : (
-                <SignUpPage />
-              )
-            }
-            />
-            <Route 
-              path="/" 
-              element={
-                <Navigate to={isConnected ? "/chat" : "/login"} replace />
-              } 
+              }
             />
           </Routes>
         </div>

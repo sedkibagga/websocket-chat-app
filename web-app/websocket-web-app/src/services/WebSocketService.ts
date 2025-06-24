@@ -10,7 +10,6 @@ class WebSocketService {
   connect(
     user: loginUserResponse,
     onUserListUpdated: (users: loginUserResponse[]) => void,
-    // onPrivateMessage: (message: string) => void,
     onChatMessage: (notification: ChatNotification) => void,
     onError: (error: string) => void
   ) {
@@ -57,8 +56,8 @@ class WebSocketService {
 
 
 
-      this.stompClient?.subscribe(`/user/${user.fullName}/queue/messages`, (message) => {
-        console.log(`Subscribed to /user/${user.fullName}/queue/messages`);
+      this.stompClient?.subscribe(`/user/${user.id}/queue/messages`, (message) => {
+        console.log(`Subscribed to /user/${user.id}/queue/messages`);
         console.log("Received chat message in my private queue:", message.body);
         try {
           const notification = JSON.parse(message.body) as ChatNotification;
@@ -141,7 +140,7 @@ class WebSocketService {
     if (this.stompClient && this.currentUser) {
       console.log("currentUser in sendChatMessage:", this.currentUser);
       const chatMessage: ChatMessage = { //ymkn ysir prob fil chatId 
-        senderId: this.currentUser.fullName,
+        senderId: this.currentUser.id,
         recipientId,
         content,
         timestamp: new Date()

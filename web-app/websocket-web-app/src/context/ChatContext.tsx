@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { webSocketService } from '../services/WebSocketService';
-import type { ChatMessage, User } from '../types/Types';
+import type { ChatMessage } from '../types/Types';
 import apisController from '../apis/services/apisController';
 import type { loginUserResponse } from '../apis/DataResponse/responses';
 interface ChatContextType {
@@ -22,6 +22,9 @@ interface ChatContextType {
   fetchUsers: () => Promise<void>;
   fetchChatMessages: (senderId: string, recipientId: string) => Promise<void>;
   error: string | null;
+  setError: (error: string | null) => void;
+  selectedUser: loginUserResponse | null;
+  setSelectedUser: (user: loginUserResponse | null) => void;
 }
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -35,11 +38,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [senderId, setSenderId] = useState<string>("");
   const [recipientId, setRecipientId] = useState<string>("");
   const [isConnected, setIsConnected] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<loginUserResponse | null>(null);
 
-  const connect = (user: loginUserResponse) => {
+  const connect = async (user: loginUserResponse) => {
     setCurrentUser(user);
     console.log("Connecting user:", user);
-
+     if (user.id && selectedUser?.id) {
+      const existingMessages = await apisController.findChatMessages(user.id, selectedUser.id);
+      setChatMessages(existingMessages);
+      console.log("Fetched existing messages:", existingMessages);
+    }
     webSocketService.connect(
       user,
       (updatedUsers) => setUsers(updatedUsers),
@@ -151,7 +159,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       fetchChatMessages,
       error,
       isConnected,
-      setIsConnected
+      setIsConnected,
+      setError,
+      selectedUser,
+      setSelectedUser
     }}>
       {children}
     </ChatContext.Provider>

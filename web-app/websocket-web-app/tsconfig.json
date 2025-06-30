@@ -3,5 +3,16 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+   
+  "compilerOptions": {
+    "noUnusedLocals": false,      // Disables "unused variable" errors (e.g., React imports)
+    "noUnusedParameters": false,  // Disables "unused function parameter" errors
+    "skipLibCheck": true,         // Skips type-checking library files (optional)
+    "jsx": "react-jsx",           // Ensures JSX works without explicit React import (React 17+)
+    "strict": true     
+  },
+  
+  
+  
 }

@@ -15,7 +15,9 @@ class WebSocketService {
   ) {
     this.currentUser = user;
 
-    const socket = new SockJS('http://localhost:8080/ws');
+    //const socket = new SockJS('http://localhost:8080/ws');
+    const socket = new SockJS('https://websocket-chat-app-nre2.onrender.com/ws');
+
     this.stompClient = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,

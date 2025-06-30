@@ -3,7 +3,8 @@ import type { addUserDto, loginUserDto, logoutUserDto } from "../DataParam/dtos"
 import type { addUserResponse, loginUserResponse, usersDataResponse } from "../DataResponse/responses";
 import type { ChatMessage } from "../../types/Types";
 
-const BaseUri = "http://localhost:8080/";
+//const BaseUri = "http://localhost:8080/";
+const BaseUri = "https://websocket-chat-app-nre2.onrender.com/";
 
 const login = async (data: loginUserDto): Promise<loginUserResponse> => {
     try {

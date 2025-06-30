@@ -138,7 +138,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchChatMessages(senderId, recipientId); 
 
   }, []);
-  
+   
+  useEffect(() => {
+  if (currentUser) {
+    connect(currentUser);
+  }
+}, [currentUser]);
+
 
   return (
     <ChatContext.Provider value={{

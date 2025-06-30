@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useChat } from '../context/ChatContext';
 import { Button } from "flowbite-react";
 import { useNavigate } from 'react-router-dom';
-import type { loginUserDto } from '../apis/DataParam/dtos';
 import apisController from '../apis/services/apisController';
 import type { loginUserResponse } from '../apis/DataResponse/responses';
 
@@ -23,7 +22,7 @@ const Login: React.FC = () => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
-    const { connect, currentUser, setCurrentUser } = useChat();
+    const { connect,  setCurrentUser } = useChat();
     const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
     const [darkMode, setDarkMode] = useState(false);
     const [redMode, setRedMode] = useState(false);

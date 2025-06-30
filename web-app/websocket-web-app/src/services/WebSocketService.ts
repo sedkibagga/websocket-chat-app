@@ -1,9 +1,7 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import type { User } from '../types/Types';
 import type { ChatMessage, ChatNotification } from '../types/Types';
 import type { loginUserResponse } from '../apis/DataResponse/responses';
-import { useChat } from '../context/ChatContext';
 class WebSocketService {
   private stompClient: Client | null = null;
   private currentUser: loginUserResponse | null = null;

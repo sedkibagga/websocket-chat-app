@@ -1,4 +1,3 @@
-import React from 'react'
 import avatar from '../assets/avatar.png';
 import type { loginUserResponse } from '../apis/DataResponse/responses';
 import { useChat } from '../context/ChatContext';

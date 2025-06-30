@@ -1,4 +1,3 @@
-import React from 'react'
 import ChatUI from '../components/ChatUI'
 
 function ChatPage() {

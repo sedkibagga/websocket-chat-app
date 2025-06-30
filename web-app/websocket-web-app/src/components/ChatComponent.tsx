@@ -1,5 +1,5 @@
 import { Button } from 'flowbite-react';
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import ChatCardComponent from './ChatCardComponent';
 import { useChat } from '../context/ChatContext';
 import apisController from '../apis/services/apisController';

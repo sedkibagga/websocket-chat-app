@@ -76,16 +76,13 @@ const findAllUsers = async () :Promise<usersDataResponse[]> => {
 
 const findChatMessages = async (senderId: string, recipientId: string): Promise<ChatMessage[]> => {
     try {
-        const response = await axios.get(`${BaseUri}messages/${senderId}/${recipientId}`);
-        console.log("Find chat messages response data:", response.data);
+        const url = `${BaseUri}messages/${senderId}/${recipientId}`;
+        console.log("Fetching messages from URL:", url);  // Add this line
+        const response = await axios.get(url);
         return response.data;
     } catch (error: any) {
         console.error("Error fetching chat messages:", error);
-        throw new Error(
-            error.response?.data?.message || 
-            error.message || 
-            "Failed to fetch chat messages"
-        );
+        throw error;
     }
 }
 

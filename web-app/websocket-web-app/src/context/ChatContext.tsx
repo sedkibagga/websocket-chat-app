@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { webSocketService } from '../services/WebSocketService';
 import type { ChatMessage } from '../types/Types';
 import apisController from '../apis/services/apisController';
@@ -98,20 +98,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const fetchChatMessages = async (senderId: string, recipientId: string) => {
+  const fetchChatMessages = useCallback(async (senderId: string, recipientId: string) => {
     try {
-      if (!currentUser) {
-        console.error('No current user to fetch chat messages for');
-        return;
-      }
       const response = await apisController.findChatMessages(senderId, recipientId);
-      setChatMessages(response);
-    }
-    catch (error: any) {
+      setChatMessages(prev => {
+        // Merge new messages with existing ones, avoiding duplicates
+        const newMessages = response.filter(newMsg => 
+          !prev.some(existingMsg => existingMsg.id === newMsg.id)
+        );
+        return [...prev, ...newMessages];
+      });
+    } catch (error) {
       console.error('Failed to fetch chat messages:', error);
-      setError(error instanceof Error ? error.message : 'Failed to fetch chat messages');
     }
-  }
+  }, []);
   
   
 

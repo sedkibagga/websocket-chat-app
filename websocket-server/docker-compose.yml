@@ -30,6 +30,25 @@ services:
     networks:
       - websocket-network
 
+  app:
+    build: .
+    image: baggasedki/websocket-server:latest
+    container_name: websocket-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    networks:
+      - websocket-network
+    environment:
+        SPRING_DATA_MONGODB_HOST: mongodb
+        SPRING_DATA_MONGODB_PORT: 27017
+        SPRING_DATA_MONGODB_DATABASE: chat_app
+        SPRING_DATA_MONGODB_USERNAME: bagga
+        SPRING_DATA_MONGODB_PASSWORD: 3asfour25102212
+        SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: admin
+
+
 volumes:
   mongo:
 

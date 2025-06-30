@@ -42,6 +42,20 @@ public class ChatController {
                         .content(savedMsg.getContent())
                         .build()
         );
+
+        this.messagingTemplate.convertAndSendToUser(
+                chatMessage.getSenderId(),
+                "/queue/messages",
+                ChatNotification.builder()
+                        .id(savedMsg.getId())
+                        .chatId(savedMsg.getChatId())
+                        .senderId(savedMsg.getSenderId())
+                        .recipientId(savedMsg.getRecipientId())
+                        .content(savedMsg.getContent())
+                        .build()
+        );
+
+
     }
     @GetMapping("/messages/{senderId}/{recipientId}")
     public ResponseEntity<List<ChatMessage>> findChatMessages(@PathVariable("senderId") String senderId, @PathVariable("recipientId") String recipientId) {

@@ -6,14 +6,17 @@ import apisController from '../apis/services/apisController';
 import type { logoutUserDto } from '../apis/DataParam/dtos';
 import { useNavigate } from 'react-router-dom';
 import avatar from '../assets/avatar.png';
+import type { ChatMessage } from '../types/Types';
 
 function ChatComponent() {
     const navigate = useNavigate();
-    const { users, currentUser, disconnect, selectedUser , sendChatMessage , chatMessages} = useChat();
+    const { users, currentUser, disconnect, selectedUser, sendChatMessage, chatMessages, fetchChatMessages } = useChat();
     const [showUsersOnMobile, setShowUsersOnMobile] = useState<boolean>(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
     const [messageInput, setMessageInput] = useState<string>('');
+    const [conversationMessages, setConversationMessages] = useState<ChatMessage[]>([]);
     console.log("chatMessages in ChatComponent:", chatMessages);
+    console.log("conversationMessages in ChatComponent:", conversationMessages);
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth < 640);
@@ -23,6 +26,37 @@ function ChatComponent() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // useEffect(() => {
+    //     if (currentUser && selectedUser) {
+    //         chatMessages.forEach((message) => {
+    //             if (message.senderId === currentUser.id && message.recipientId === selectedUser.id) {
+    //                 setConversationMessages(prev => [...prev, message]);
+    //             } else if (message.senderId === selectedUser.id && message.recipientId === currentUser.id) {
+    //                 setConversationMessages(prev => [...prev, message]);
+    //             }
+    //         });
+    //     }
+    // }, [currentUser, selectedUser, chatMessages]);
+
+    useEffect(() => {
+        if (currentUser && selectedUser) {
+            const filtered = chatMessages.filter(
+                msg => (msg.senderId === currentUser.id && msg.recipientId === selectedUser.id) ||
+                    (msg.senderId === selectedUser.id && msg.recipientId === currentUser.id)
+            );
+            setConversationMessages(filtered);
+
+        }
+    }, [chatMessages, currentUser, selectedUser]);
+
+    useEffect(() => {
+        if (currentUser?.id && selectedUser?.id) {
+            fetchChatMessages(currentUser.id, selectedUser.id);
+            
+        }
+    }, [currentUser?.id, selectedUser?.id]);
+
 
     const handleDisconnect = async () => {
         try {
@@ -41,12 +75,14 @@ function ChatComponent() {
             alert('Logout failed. Please try again.');
         }
     };
-    
+
     const handleSendMessage = () => {
         console.log("Sending message to:", selectedUser?.nickName, "Message:", messageInput);
         if (selectedUser && messageInput.trim()) {
             sendChatMessage(selectedUser.id, messageInput);
             setMessageInput('');
+            fetchChatMessages(currentUser?.id || '', selectedUser.id);
+
         }
     }
     return (
@@ -60,7 +96,7 @@ function ChatComponent() {
                     <div className='text-white text-sm sm:text-lg font-semibold'>
                         {currentUser?.nickName || 'User'}
                     </div>
-                    <Button 
+                    <Button
                         className='text-white text-sm sm:text-lg font-semibold ml-2 sm:ml-4'
                         onClick={handleDisconnect}
                     >
@@ -83,8 +119,8 @@ function ChatComponent() {
                         {isMobile && (
                             <div className='flex justify-between items-center mb-2'>
                                 <h2 className='text-white text-lg font-bold'>Users</h2>
-                                <Button 
-                                    color="gray" 
+                                <Button
+                                    color="gray"
                                     size="xs"
                                     onClick={() => setShowUsersOnMobile(false)}
                                 >
@@ -113,11 +149,11 @@ function ChatComponent() {
                             </div>
                         </div>
 
-                     
+
                         <div className='flex-1 overflow-y-auto'>
                             <div className="space-y-2">
                                 {users.map((user) => (
-                                    <ChatCardComponent 
+                                    <ChatCardComponent
                                         key={user.id}
                                         user={user}
                                         onClick={() => {
@@ -135,7 +171,7 @@ function ChatComponent() {
                     {/* Mobile Show Users Button */}
                     {isMobile && !showUsersOnMobile && (
                         <div className='p-2 sm:hidden'>
-                            <Button 
+                            <Button
                                 className='w-full bg-blue-600 hover:bg-blue-700'
                                 onClick={() => setShowUsersOnMobile(true)}
                             >
@@ -171,8 +207,8 @@ function ChatComponent() {
                             <div className='flex-1 overflow-y-auto p-4'>
                                 {/* Messages will go here */}
                                 <div className='text-gray-400 text-center py-8'>
-                                    {chatMessages.length > 0 ? (
-                                        chatMessages.map((msg, index) => (
+                                    {conversationMessages.length > 0 ? (
+                                        conversationMessages.map((msg, index) => (
                                             <div key={index} className={`mb-2 ${msg.senderId === currentUser?.id ? 'text-right' : 'text-left'}`}>
                                                 <div className={`inline-block px-4 py-2 rounded-lg ${msg.senderId === currentUser?.id ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
                                                     {msg.content}
@@ -189,13 +225,14 @@ function ChatComponent() {
                             </div>
 
                             {/* Message Input */}
-                            <div className='p-4 border-t border-gray-700'>
+                            <div className='p-4 border-t border-gray-700 mb-10 sm:mb-2'>
                                 <div className='flex space-x-2'>
                                     <input
                                         type="text"
                                         placeholder="Type a message..."
                                         className='flex-1 p-2 rounded-lg bg-gray-700 text-white'
                                         onChange={(e) => setMessageInput(e.target.value)}
+                                        value={messageInput}
                                     />
                                     <Button color="blue" onClick={handleSendMessage}>Send</Button>
                                 </div>

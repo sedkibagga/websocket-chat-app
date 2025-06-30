@@ -15,7 +15,7 @@ interface ChatContextType {
   setIsConnected: (isConnected: boolean) => void;
   setRecipientId: (recipientId: string) => void;
   chatMessages: ChatMessage[];
-  privateMessages: string[];
+  // privateMessages: string[];
   connect: (user: loginUserResponse) => void;
   disconnect: () => void;
   sendChatMessage: (recipientId: string, content: string) => void;
@@ -25,7 +25,7 @@ interface ChatContextType {
   setError: (error: string | null) => void;
   selectedUser: loginUserResponse | null;
   setSelectedUser: (user: loginUserResponse | null) => void;
-  setPrivateMessages: (messages: string[]) => void;
+  // setPrivateMessages: (messages: string[]) => void;
 }
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -34,7 +34,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentUser, setCurrentUser] = useState<loginUserResponse | null>(null);
   const [users, setUsers] = useState<loginUserResponse[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [privateMessages, setPrivateMessages] = useState<string[]>([]);
+  // const [privateMessages, setPrivateMessages] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [senderId, setSenderId] = useState<string>("");
   const [recipientId, setRecipientId] = useState<string>("");
@@ -158,7 +158,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       recipientId,
       setRecipientId,
       chatMessages,
-      privateMessages,
+      // privateMessages,
       connect,
       disconnect,
       sendChatMessage,
@@ -170,7 +170,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError,
       selectedUser,
       setSelectedUser,
-      setPrivateMessages
+      // setPrivateMessages
     }}>
       {children}
     </ChatContext.Provider>

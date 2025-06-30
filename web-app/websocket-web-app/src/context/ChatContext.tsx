@@ -25,6 +25,7 @@ interface ChatContextType {
   setError: (error: string | null) => void;
   selectedUser: loginUserResponse | null;
   setSelectedUser: (user: loginUserResponse | null) => void;
+  setPrivateMessages: (messages: string[]) => void;
 }
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -67,7 +68,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return newMessages;
         });
       },
-      (error) => setError(error)
+      // onError: (error) => setError(error)
     );
   };
 
@@ -168,7 +169,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsConnected,
       setError,
       selectedUser,
-      setSelectedUser
+      setSelectedUser,
+      setPrivateMessages
     }}>
       {children}
     </ChatContext.Provider>

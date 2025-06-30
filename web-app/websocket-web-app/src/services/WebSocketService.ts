@@ -9,7 +9,7 @@ class WebSocketService {
     user: loginUserResponse,
     onUserListUpdated: (users: loginUserResponse[]) => void,
     onChatMessage: (notification: ChatNotification) => void,
-    onError: (error: string) => void
+    // onError: (error: string) => void
   ) {
     this.currentUser = user;
 

@@ -1,11 +1,11 @@
 spring:
   data:
     mongodb:
-      username: bagga
-      password: 3asfour25102212
+      username:
+      password: 
       host: localhost
       port: 27017
-      database: chat_app
+      database: 
       authentication-database: admin
 
 server:
